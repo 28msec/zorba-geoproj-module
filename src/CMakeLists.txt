@@ -14,9 +14,7 @@
 
 # all external module libraries are generated in the directory
 # of the corresponding .xq file
-MESSAGE(STATUS "Add org")
 MESSAGE(STATUS "Add com")
-ADD_SUBDIRECTORY(org)
 ADD_SUBDIRECTORY(com)
 
 MESSAGE(STATUS "End modules")
