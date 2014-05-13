@@ -11,10 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# all external module libraries are generated in the directory
-# of the corresponding .xq file
-MESSAGE(STATUS "Add com")
-ADD_SUBDIRECTORY(com)
-
-MESSAGE(STATUS "End modules")
+DECLARE_ZORBA_SCHEMA (FILE geoproj-param.xsd
+  URI "http://zorba.io/modules/geoproj-param")
+DECLARE_ZORBA_MODULE (URI "http://zorba.io/modules/geoproj" VERSION 1.0 FILE "geoproj.xq")

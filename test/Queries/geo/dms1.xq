@@ -1,4 +1,4 @@
-import module namespace geoproj = "http://www.zorba-xquery.com/modules/geoproj";
+import module namespace geoproj = "http://zorba.io/modules/geoproj";
 
 (geoproj:dms-to-deg("10d10'10"),
 geoproj:dms-to-deg("10d"),

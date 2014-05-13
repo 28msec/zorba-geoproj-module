@@ -17,67 +17,67 @@ xquery version "3.0";
 :)
 
 (:~
- : Geographic projection module.<br/>
- : Forward and inverse projection from WGS84 lat-long coordinates to Oblique Mercator x-y projection.<br/>
- : Oblique Mercator projection is a sphere to cylinder projection.<br/>
- : This projection results in a conformal output, meaning the shape of small areas is preserved,
+ : <p>Geographic projection module.</p>
+ : <p>Forward and inverse projection from WGS84 lat-long coordinates to Oblique Mercator x-y projection.</p>
+ : <p>Oblique Mercator projection is a sphere to cylinder projection.</p>
+ : <p>This projection results in a conformal output, meaning the shape of small areas is preserved,
  : no matter the distance from the origin. But it is not equal area, meaning the area size increases heavily
  : when getting closer to North or South. The area size increases with the same amount on x and y axes,
- : so the relative shape remains almost the same.   <br/>
- : Mercator projection is the oldest projection, and it is still widely used because it produces a rectangular map.
- : This projection is used in Google Maps because of its conformal output. <br/>
- : For military or measurements purposes the UTM projection is used (or variants). This splits the Earth into small
- : areas and computes the cartesian coordinates relative to each area.<br/>
- : <br/>
- : Here we use Oblique Mercator projection. Its advantage over the normal Mercator is that you can set the tangent point
+ : so the relative shape remains almost the same.</p>   
+ : <p>Mercator projection is the oldest projection, and it is still widely used because it produces a rectangular map.</p>
+ : <p>This projection is used in Google Maps because of its conformal output.</p> 
+ : <p>For military or measurements purposes the UTM projection is used (or variants). This splits the Earth into small
+ : areas and computes the cartesian coordinates relative to each area.</p>
+ : <p/> 
+ : <p>Here we use Oblique Mercator projection. Its advantage over the normal Mercator is that you can set the tangent point
  : between the cylinder and the sphere to be anywhere on Earth. So you can set the center of the map to be close
- : to the area you want projected and be able to measure accurately the distances between points and lines.
- : The map deformation is minimal close to the center point and close to the "equator" line.<br/>
- : The advantage over the UTM projection is that it can also produce a global rectangular map, like Mercator, 
- : which is great for viewing.<br/>
- : The disadvantage over Mercator is that it needs more processing power.<br/>
- : <br/>
- : WGS84 is the ellipsoid aproximation of the Earth, with big radius of 6,378,137 m and small radius of 6,356,752.3 m.
- : The geographic coordinates expressed for this ellipsoid are widely used today in maps and gps coordinates. 
- : It is the default standard for representing geographic coordinates.<br/>
- : <br/>
- : The purpose of this module is to provide convertion from polar to cartesian coordinates, so you can 
- : process the geographic data with the Simple Features API functions implemented in the geo module.
- : That module works only with cartesian coordinates, but most maps have polar coordinates. <br/>
- : <br/>
- : The projection formulas are taken from lib_proj library and implemented in XQuery. 
+ : to the area you want projected and be able to measure accurately the distances between points and lines.</p>
+ : <p>The map deformation is minimal close to the center point and close to the "equator" line.</p>
+ : <p>The advantage over the UTM projection is that it can also produce a global rectangular map, like Mercator, 
+ : which is great for viewing.</p>
+ : <p>The disadvantage over Mercator is that it needs more processing power.</p>
+ : <p/> 
+ : <p>WGS84 is the ellipsoid aproximation of the Earth, with big radius of 6,378,137 m and small radius of 6,356,752.3 m.</p>
+ : <p>The geographic coordinates expressed for this ellipsoid are widely used today in maps and gps coordinates.</p> 
+ : <p>It is the default standard for representing geographic coordinates.</p>
+ : <p/> 
+ : <p>The purpose of this module is to provide convertion from polar to cartesian coordinates, so you can 
+ : process the geographic data with the Simple Features API functions implemented in the geo module.</p>
+ : <p>That module works only with cartesian coordinates, but most maps have polar coordinates.</p> 
+ : <p/> 
+ : <p>The projection formulas are taken from lib_proj library and implemented in XQuery.</p> 
  :
  : @author Daniel Turcanu
- : @project geo
+ : @project Zorba/Geo Projection/Geo Projection
  :)
-module namespace geoproj = "http://www.zorba-xquery.com/modules/geoproj";
+module namespace geoproj = "http://zorba.io/modules/geoproj";
 
 (:~
- : W3C Math namespace URI.
+ : <p>W3C Math namespace URI.</p>
 :)
 declare namespace math="http://www.w3.org/2005/xpath-functions/math";
 
 declare namespace err = "http://www.w3.org/2005/xqt-errors";
 
 (:~
- : Import module for checking if geoproj parameters are validated.
+ : <p>Import module for checking if geoproj parameters are validated.</p>
  :)
-import module namespace schemaOptions = "http://www.zorba-xquery.com/modules/schema";
+import module namespace schemaOptions = "http://zorba.io/modules/schema";
 
 
 (:~
- : Contains the definitions of the geoproj parameters.
-:)
-import schema namespace geoproj-param = "http://www.zorba-xquery.com/modules/geoproj-param";
+ : <p>Contains the definitions of the geoproj parameters.</p>
+ :)
+import schema namespace geoproj-param = "http://zorba.io/modules/geoproj-param";
 
 declare namespace gml="http://www.opengis.net/gml";
 
-declare namespace ver = "http://www.zorba-xquery.com/options/versioning";
+declare namespace ver = "http://zorba.io/options/versioning";
 declare option ver:module-version "1.0";
 
 (:~
- : Convert angle from degrees to radians. <br/>
- : The parameter is first reduced to value range of (-360, 360).
+ : <p>Convert angle from degrees to radians.</p> 
+ : <p>The parameter is first reduced to value range of (-360, 360).</p>
  : 
  : @param $deg angle in  degrees
  : @return value in radians (-2PI, 2PI)
@@ -88,7 +88,7 @@ declare function geoproj:deg-to-rad($deg as xs:double) as xs:double
 };
 
 (:~
- : Convert angle from radians to degrees. <br/>
+ : <p>Convert angle from radians to degrees.</p> 
  : 
  : @param $rad value in radians
  : @return value in degrees (-360, 360)
@@ -100,7 +100,7 @@ declare function geoproj:rad-to-deg($rad as xs:double) as xs:double
 
 
 (:~
- : Compute the isometric latitude of $phi latitude.
+ : <p>Compute the isometric latitude of $phi latitude.</p>
  : 
  : @param $phi a latitude
  : @return isometric latitude in radians
@@ -169,36 +169,36 @@ declare %private function geoproj:wgs84-to-omerc-validated(
 };
 
 (:~
- : Forward projection from geographic coordinates lat-long on WGS84 ellipsoid to Oblique Mercator cylinder.<br/>
- : The Oblique Mercator projection is like the standard Mercator projection, but you can choose the point of origin.<br/>
- : Specify the coordinates of the center point somewhere near the points being projected, 
- : so the projection deformation is small.<br/>
- : The azimuth in the center point, alpha, is hardcoded to zero, so the true north is preserved.
- : This is a simplification of the standard Oblique Mercator projection. <br/>
- : Gamma, the azimuth of the rectified bearing of center line is also zero, calculated from alpha.<br/>
- : <br/>
- : The radius of the Earth in WGS84 is 6378137 m.<br/>
- : Reverse flatening 298.257223563.<br/>
- : Eccentricity e 0.0818192.<br/>
- :<br/>
+ : <p>Forward projection from geographic coordinates lat-long on WGS84 ellipsoid to Oblique Mercator cylinder.</p>
+ : <p>The Oblique Mercator projection is like the standard Mercator projection, but you can choose the point of origin.</p>
+ : <p>Specify the coordinates of the center point somewhere near the points being projected, 
+ : so the projection deformation is small.</p>
+ : <p>The azimuth in the center point, alpha, is hardcoded to zero, so the true north is preserved.</p>
+ : <p>This is a simplification of the standard Oblique Mercator projection.</p> 
+ : <p>Gamma, the azimuth of the rectified bearing of center line is also zero, calculated from alpha.</p>
+ : <p/> 
+ : <p>The radius of the Earth in WGS84 is 6378137 m.</p>
+ : <p>Reverse flatening 298.257223563.</p>
+ : <p>Eccentricity e 0.0818192.</p>
+ :
  : @param $lat_0 is the latitude for center point, in degrees (-90, 90)
  : @param $long_c is the longitude for center point, in degrees (-180, 180)
  : @param $k0 is the scale in the center point. The scale will increase when going far to north and south.
  :        Use value 1 to get the true distances between points, in meters.
  :        At equator, the distance for 1 degree is aproximately 110 km.
- : @param $lat_long_degrees a sequence of nodes of type <br/>
- :   &lt;latlong&gt;&lt;lat&gt;<i>latitude degree</i>&lt;/lat&gt;&lt;long&gt;<i>longitude degree</i>&lt;/long&gt;&lt;/latlong&gt;<br/>
- :   in namespace "http://www.zorba-xquery.com/modules/geoproj-param". Each node in the sequence is validated
+ : @param $lat_long_degrees a sequence of nodes of type 
+ :   &lt;latlong&gt;&lt;lat&gt;<i>latitude degree</i>&lt;/lat&gt;&lt;long&gt;<i>longitude degree</i>&lt;/long&gt;&lt;/latlong&gt;
+ :   in namespace "http://zorba.io/modules/geoproj-param". Each node in the sequence is validated
  :   against the according schema.
  :
  : @error err:XQDY0027 if any of the nodes passed in the $lat-long-degress parameter is
  :  not valid according to the schema.
  :
- : @return a sequence of x-y coordinates in format <br/>
- :   &lt;coord&gt;&lt;x&gt;<i>x</i>&lt;/x&gt;&lt;y&gt;<i>y</i>&lt;/y&gt;&lt;/coord&gt; <br/>
- :   in namespace "http://www.zorba-xquery.com/modules/geoproj-param" <br/>
- :   Note that the x coordinate corresponds to the longitude, and y coordinate to the latitude.<br/>
- :   The coordinates are expressed in meters.<br/>
+ : @return a sequence of x-y coordinates in format 
+ :   &lt;coord&gt;&lt;x&gt;<i>x</i>&lt;/x&gt;&lt;y&gt;<i>y</i>&lt;/y&gt;&lt;/coord&gt; 
+ :   in namespace "http://zorba.io/modules/geoproj-param" 
+ :   Note that the x coordinate corresponds to the longitude, and y coordinate to the latitude.
+ :   The coordinates are expressed in meters.
  :   The coordinates are relative to the center point.
   @example test/Queries/geo/geoproj1.xq
   @example test/Queries/geo/geoproj5.xq
@@ -226,24 +226,24 @@ declare function geoproj:wgs84-to-omerc( $lat-0 as xs:double,
 
 
 (:~
- : Forward projection from geographic coordinates lat-long on WGS84 ellipsoid to Oblique Mercator cylinder.<br/>
- : This is an intermediate function for wgs84-to-omerc.<br/>
- : The difference is that it returns the x-y coordinates in gml:pos format,
- : gml being the prefix for the GML namespace "http://www.opengis.net/gml".<br/>
- :<br/>
+ : <p>Forward projection from geographic coordinates lat-long on WGS84 ellipsoid to Oblique Mercator cylinder.</p>
+ : <p>This is an intermediate function for wgs84-to-omerc.</p>
+ : <p>The difference is that it returns the x-y coordinates in gml:pos format,
+ : gml being the prefix for the GML namespace "http://www.opengis.net/gml".</p>
+ :
  : @param $lat_0 is the latitude for center point, in degrees (-90, 90)
  : @param $long_c is the longitude for center point, in degrees (-180, 180)
  : @param $k0 is the scale in the center point. 
- : @param $lat_long_degrees a sequence of nodes of type <br/>
- :   &lt;latlong&gt;&lt;lat&gt;<i>latitude degree</i>&lt;/lat&gt;&lt;long&gt;<i>longitude degree</i>&lt;/long&gt;&lt;/latlong&gt;<br/>
- :   in namespace "http://www.zorba-xquery.com/modules/geoproj-param". Each node in this sequence is validated according
+ : @param $lat_long_degrees a sequence of nodes of type 
+ :   &lt;latlong&gt;&lt;lat&gt;<i>latitude degree</i>&lt;/lat&gt;&lt;long&gt;<i>longitude degree</i>&lt;/long&gt;&lt;/latlong&gt;
+ :   in namespace "http://zorba.io/modules/geoproj-param". Each node in this sequence is validated according
  :   to the according schema.
  :
  : @error err:XQDY0027 if any of the nodes passed in the $lat-long-degress parameter is
  :  not valid according to the schema.
  :
- : @return a sequence of x-y coordinates in format <br/>
- :   &lt;gml:pos&gt;<i>x</i> <i>y</i>&lt;/gml:pos&gt; <br/>
+ : @return a sequence of x-y coordinates in format 
+ :   &lt;gml:pos&gt;<i>x</i> <i>y</i>&lt;/gml:pos&gt; 
  :   in namespace "http://www.opengis.net/gml"
   @example test/Queries/geo/geoproj3.xq
  :)
@@ -274,7 +274,7 @@ declare %private function geoproj:wgs84-to-omerc-gmlpos-validated( $lat_0 as xs:
 };
 
 (:~
- : Function for iterative computing of the inverse isometric latitude.
+ : <p>Function for iterative computing of the inverse isometric latitude.</p>
  : 
  : @param $i the maximum iterations
  : @param $ts precomputed value
@@ -298,7 +298,7 @@ declare %private function geoproj:proj-phi2-helper($i as xs:integer,
 };
 
 (:~
- : Function for computing the inverse isometric latitude.
+ : <p>Function for computing the inverse isometric latitude.</p>
  : 
  : @param $ts precomputed value, based on an initial latitude.
  : @param $e the Earth eccentricity. For WGS84 is hardcoded to 0.0818192.
@@ -312,27 +312,27 @@ declare %private function geoproj:proj-phi2($ts as xs:double, $e as xs:double) a
 };
 
 (:~
- : Inverse projection from cartesian coordinates on Oblique Mercator cylinder
- : to geographic coordinates lat-long on WGS84 ellipsoid.<br/>
- : The parameters for center point and scale should be the same as for the initial forward projection,
- : otherwise you will get wrong results.<br/>
- : <br/>
- :<br/>
+ : <p>Inverse projection from cartesian coordinates on Oblique Mercator cylinder
+ : to geographic coordinates lat-long on WGS84 ellipsoid.</p>
+ : <p>The parameters for center point and scale should be the same as for the initial forward projection,
+ : otherwise you will get wrong results.</p>
+ : 
+ :
  : @param $lat_0 is the latitude for center point, in degrees (-90, 90)
  : @param $long_c is the longitude for center point, in degrees (-180, 180)
  : @param $k0 is the scale in the center point.
- : @param $coords a sequence of nodes of type <br/>
- :   &lt;coord&gt;&lt;x&gt;<i>x</i>&lt;/x&gt;&lt;y&gt;<i>y</i>&lt;/y&gt;&lt;/coord&gt; <br/>
- :   in namespace "http://www.zorba-xquery.com/modules/geoproj-param"<br/>
+ : @param $coords a sequence of nodes of type 
+ :   &lt;coord&gt;&lt;x&gt;<i>x</i>&lt;/x&gt;&lt;y&gt;<i>y</i>&lt;/y&gt;&lt;/coord&gt; 
+ :   in namespace "http://zorba.io/modules/geoproj-param"
  :   The coordinates are expressed in meters.
  :
  : @error err:XQDY0027 if any of the coordinates passed in the $coords parameter is
  :  not valid according to the schema.
  : 
- : @return a sequence of geographic coordinates in format <br/>
- :   &lt;latlong&gt;&lt;lat&gt;<i>latitude degree</i>&lt;/lat&gt;&lt;long&gt;<i>longitude degree</i>&lt;/long&gt;&lt;/latlong&gt;<br/>
- :   in namespace "http://www.zorba-xquery.com/modules/geoproj-param"<br/>
- :   Note that the longitude corresponds to the x coordinate, and the latitude to the y coordinate.<br/>
+ : @return a sequence of geographic coordinates in format 
+ :   &lt;latlong&gt;&lt;lat&gt;<i>latitude degree</i>&lt;/lat&gt;&lt;long&gt;<i>longitude degree</i>&lt;/long&gt;&lt;/latlong&gt;
+ :   in namespace "http://zorba.io/modules/geoproj-param"
+ :   Note that the longitude corresponds to the x coordinate, and the latitude to the y coordinate.
   @example test/Queries/geo/geoproj2.xq
   @example test/Queries/geo/geoproj7.xq
   @example test/Queries/geo/geoproj11.xq
@@ -403,21 +403,21 @@ declare %private function geoproj:omerc-to-wgs84-validated($lat_0 as xs:double,
 };
 
 (:~
- : Inverse projection from cartesian coordinates on Oblique Mercator cylinder
- : to geographic coordinates lat-long on WGS84 ellipsoid.<br/>
- : This is an intermediate function for omerc-to-wgs84.<br/>
- : The difference is that it works with coordinates in gml:pos format,
- : gml being the prefix for the GML namespace "http://www.opengis.net/gml".<br/>
- :<br/>
+ : <p>Inverse projection from cartesian coordinates on Oblique Mercator cylinder
+ : to geographic coordinates lat-long on WGS84 ellipsoid.</p>
+ : <p>This is an intermediate function for omerc-to-wgs84.</p>
+ : <p>The difference is that it works with coordinates in gml:pos format,
+ : gml being the prefix for the GML namespace "http://www.opengis.net/gml".</p>
+ :
  : @param $lat_0 is the latitude for center point, in degrees (-90, 90)
  : @param $long_c is the longitude for center point, in degrees (-180, 180)
  : @param $k0 is the scale in the center point. 
- : @param $gmlposs a sequence of nodes of type <br/>
- :   &lt;gml:pos&gt;<i>x</i> <i>y</i>&lt;/gml:pos&gt; <br/>
+ : @param $gmlposs a sequence of nodes of type 
+ :   &lt;gml:pos&gt;<i>x</i> <i>y</i>&lt;/gml:pos&gt; 
  :   in namespace "http://www.opengis.net/gml"
- : @return a sequence of geographic coordinates in format <br/>v
- :   &lt;latlong&gt;&lt;lat&gt;<i>latitude degree</i>&lt;/lat&gt;&lt;long&gt;<i>longitude degree</i>&lt;/long&gt;&lt;/latlong&gt;<br/>
- :   in namespace "http://www.zorba-xquery.com/modules/geoproj-param"
+ : @return a sequence of geographic coordinates in format v
+ :   &lt;latlong&gt;&lt;lat&gt;<i>latitude degree</i>&lt;/lat&gt;&lt;long&gt;<i>longitude degree</i>&lt;/long&gt;&lt;/latlong&gt;
+ :   in namespace "http://zorba.io/modules/geoproj-param"
   @example test/Queries/geo/geoproj4.xq
  :)
 declare function geoproj:omerc-gmlpos-to-wgs84($lat_0 as xs:double,
@@ -435,18 +435,18 @@ declare function geoproj:omerc-gmlpos-to-wgs84($lat_0 as xs:double,
 };
 
 (:~
- : Convertion from Degrees-Minutes-Seconds (DMS) to Degrees.<br/>
- : The values for DMS can be like 11d12'13", meaning 11 degrees, 12 minutes and 13 seconds.<br/>
- : One degree has 60 minutes, and one minute has 60 seconds.<br/>
- : The separator for degrees can be one of the characters [dDoO].<br/>
- : The separator for minutes can be one of the characters ['m].<br/>
- : The separator for seconds can be " or nothing.<br/>
- : The seconds can be a floating point number.<br/>
- : <br/>
- : The seconds can be missing, and if it is missing, the minutes can be missing too.<br/>
- : The negative value can be expressed as -11d12'13" or 11d12'13"S or 11d12'13"W.
- : Values for N (North) and E (East) are positive, and S (South) and W (West) are negative.
- :<br/>
+ : <p>Convertion from Degrees-Minutes-Seconds (DMS) to Degrees.</p>
+ : <p>The values for DMS can be like 11d12'13", meaning 11 degrees, 12 minutes and 13 seconds.</p>
+ : <p>One degree has 60 minutes, and one minute has 60 seconds.</p>
+ : <p>The separator for degrees can be one of the characters [dDoO].</p>
+ : <p>The separator for minutes can be one of the characters ['m].</p>
+ : <p>The separator for seconds can be " or nothing.</p>
+ : <p>The seconds can be a floating point number.</p>
+ : <p/> 
+ : <p>The seconds can be missing, and if it is missing, the minutes can be missing too.</p>
+ : <p>The negative value can be expressed as -11d12'13" or 11d12'13"S or 11d12'13"W.</p>
+ : <p>Values for N (North) and E (East) are positive, and S (South) and W (West) are negative.</p>
+ :
  : @param $dms the degree-minutes-seconds string expressed in the format described above
  : @return the value in degrees 
   @example test/Queries/geo/dms1.xq
@@ -494,8 +494,8 @@ declare function geoproj:dms-to-deg($dms as xs:string) as xs:double
 };
 
 (:~
- : Convertion from Degrees to Degrees-Minutes-Seconds (DMS).<br/>
- : <br/>
+ : <p>Convertion from Degrees to Degrees-Minutes-Seconds (DMS).</p>
+ : 
  : @param $deg the degree value
  : @return the value in DMS format, <i>[-]degree</i><b>d</b><i>minutes</i><b>'</b><i>seconds</i> 
   @example test/Queries/geo/dms2.xq

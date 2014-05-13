@@ -1,4 +1,4 @@
-import module namespace geoproj = "http://www.zorba-xquery.com/modules/geoproj";
+import module namespace geoproj = "http://zorba.io/modules/geoproj";
 declare namespace gml="http://www.opengis.net/gml";
 
 geoproj:omerc-gmlpos-to-wgs84(10, 10, 1 div 1000, 

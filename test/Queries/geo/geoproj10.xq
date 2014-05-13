@@ -1,5 +1,5 @@
-import module namespace geoproj = "http://www.zorba-xquery.com/modules/geoproj";
-declare namespace geoproj-param = "http://www.zorba-xquery.com/modules/geoproj-param";
+import module namespace geoproj = "http://zorba.io/modules/geoproj";
+declare namespace geoproj-param = "http://zorba.io/modules/geoproj-param";
 
 geoproj:wgs84-to-omerc(-11, 0, 1, 
                        (<geoproj-param:latlong>
